@@ -12,7 +12,7 @@ ${mobile({ padding: "0px",flexDirection:"column" })}
   
 `;
 
-const Categories = ({item}) => {
+const Categories = () => {
   return (<Container>
     {categories.map(item=>(
       <CategoryItem item={item} key={item.id}/>
