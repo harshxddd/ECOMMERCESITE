@@ -5,7 +5,11 @@ import Newsletter from "../components/Newsletter";
 import Footer from "../components/Footer";
 import { Add, Remove } from "@material-ui/icons";
 import { mobile } from "../responsive";
-
+import {useLocation} from 'react-router-dom'
+import { useEffect ,useState } from "react";
+import { publicRequest } from "../requestMethods"; 
+import { addProduct } from "../Redux/cartRedux";
+import {  useDispatch, useSelector } from "react-redux";
 const Container=styled.div``;
 const Wrapper=styled.div`
 padding: 50px;
@@ -118,38 +122,83 @@ font-weight: 500;
 
 
 const Product = () => {
+
+  const location =useLocation();
+  const id=location.pathname.split('/')[2]
   
+
+  const[product,setProduct]=useState({});
+  const[quantity,setQuantity]=useState(1);
+  const[color,setColor]=useState("");
+  const[size,setSize]=useState("");
+  const dispatch =useDispatch()
+  
+
+  useEffect(()=>{
+
+    const getProduct=async()=>{
+
+      try{
+        const res = await publicRequest.get(`/products/find/`+id)
+        setProduct(res.data)
+
+      }catch(err){
+        console.log(err)
+
+      }
+
+    }
+      getProduct()
+
+
+
+    
+
+  },[id])
+
+  const handleQuantity =(type)=>{
+    if (type==='dec'){
+     quantity >1 && setQuantity(quantity-1)
+    }
+    else{
+      setQuantity(quantity+1)
+    }
+  }
+ 
+  const handleClick=()=>{
+    // update cart
+    dispatch(addProduct({...product,quantity,color,size}))
+   
+  }
+
+
+
   return (
     <Container>
         <Navbar/>
         <Anouncement/>
         <Wrapper>
           <ImgContainer>
-          <Image src="https://i.ibb.co/S6qMxwr/jean.jpg"/>
+          <Image src={product.img}/>
           
           </ImgContainer>
           <InfoContainer>
-            <Title>Denim Jacket</Title>
-            <Desc>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. </Desc>
-            <Price>$20</Price>
+            <Title>{product.title}</Title>
+            <Desc>{product.desc} </Desc>
+            <Price>{product.price}</Price>
 
             <FilterContainer>
             <Filter>
       
             <FilterTitle>Color</FilterTitle>
-            <FilterColor color="black"/>
-            <FilterColor color="darkblue" />
-            <FilterColor color="gray"/>
+            {product.color?.map(c=>(<FilterColor color={c} key={c} onClick={()=>setColor(c)}/>))}
+            
             </Filter>
             <Filter>
           <FilterTitle>Size</FilterTitle>
-          <FilterSize>
-          <FilterSizeOption>XS</FilterSizeOption>
-          <FilterSizeOption>S</FilterSizeOption>
-          <FilterSizeOption>M</FilterSizeOption>
-          <FilterSizeOption>L</FilterSizeOption>
-          <FilterSizeOption>XL</FilterSizeOption>
-
+          <FilterSize onChange={(e)=>setSize(e.target.value)} >
+            {product.size?.map((s)=>(<FilterSizeOption key={s}>{s}</FilterSizeOption> ))}
+          
           </FilterSize>
 
 
@@ -161,13 +210,13 @@ const Product = () => {
             <AddContainer>
               <AmountContainer>
 
-                <Remove/>
-                <Amount>1</Amount>
-                <Add/>
+                <Remove onClick={()=>handleQuantity('dec')}/>
+                <Amount>{quantity}</Amount>
+                <Add onClick={()=>handleQuantity('inc')}/>
                 
 
               </AmountContainer>
-              <Button>ADD TO CART</Button>
+              <Button onClick={handleClick}>ADD TO CART</Button>
             </AddContainer>
             
           </InfoContainer>

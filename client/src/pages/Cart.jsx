@@ -4,6 +4,8 @@ import Anouncement from "../components/Anouncement";
 import Footer from "../components/Footer";
 import { Add, Remove } from "@material-ui/icons";
 import { mobile } from "../responsive";
+import { useSelector } from "react-redux";
+import StripeCheckout from 'react-stripe-checkout'
 
 const Container = styled.div`
 `;
@@ -157,6 +159,7 @@ const Summary = styled.div`
   `
 
 const Cart = () => {
+  const cart = useSelector(state=>state.cart)
   return (
     <Container>
       <Navbar />
@@ -174,80 +177,55 @@ const Cart = () => {
         </Top>
         <Bottom>
           <Info>
-            <Product>
+           {cart.products.map(product=>(<Product>
               <ProductDetail>
-                <Image src="https://i.ibb.co/VWPzTQq/image.png" />
+                <Image src={product.img} />
                 <Details>
                   <ProductName>
-                    <b>Product</b>JESSIE THUNDER SHOES
+                    <b>Product</b>{product.title}
                   </ProductName>
                   <ProductId>
-                    <b>ID:</b>93813718293
+                    <b>ID:</b>{product._id}
                   </ProductId>
-                  <ProductColor color="black"/>
+                  <ProductColor color={product.color}/>
                   <ProductSize>
-                    <b>Size: </b>37.5
+                    <b>Size: </b>{product.size}
                   </ProductSize>
                 </Details>
               </ProductDetail>
               <PriceDetail>
             <ProductAmountContainer>
                 <Add/>
-                <ProductAmount>2</ProductAmount>
+                <ProductAmount>{product.quantity}</ProductAmount>
                 <Remove/>
             </ProductAmountContainer>
-            <ProductPrice>$30</ProductPrice>
+            <ProductPrice>{product.price * product.quantity}</ProductPrice>
 
               </PriceDetail>
-            </Product>
-            <Hr/>
-            <Product>
-              <ProductDetail>
-                <Image src="https://i.pinimg.com/originals/2d/af/f8/2daff8e0823e51dd752704a47d5b795c.png" />
-                <Details>
-                  <ProductName>
-                    <b>Product</b>HAKURA T-SHIRT
-                  </ProductName>
-                  <ProductId>
-                    <b>ID:</b>93813718293
-                  </ProductId>
-                  <ProductColor color="GRAY"/>
-                  <ProductSize>
-                    <b>Size: </b>M
-                  </ProductSize>
-                </Details>
-              </ProductDetail>
-              <PriceDetail>
-            <ProductAmountContainer>
-                <Add/>
-                <ProductAmount>2</ProductAmount>
-                <Remove/>
-            </ProductAmountContainer>
-            <ProductPrice>$30</ProductPrice>
-
-              </PriceDetail>
-            </Product>
+            </Product>))}
+            <Hr/> 
+            
           </Info>
           <Summary>
             <SummaryTitle>ORDER SUMMARY</SummaryTitle>
             <SummaryItem>
             <SummaryItemText>Subtotal</SummaryItemText>
-            <SummaryItemPrice>$80</SummaryItemPrice>
+            <SummaryItemPrice>{cart.total}</SummaryItemPrice>
 
             </SummaryItem>
             <SummaryItem>
             <SummaryItemText>Estimated Shipping</SummaryItemText>
-            <SummaryItemPrice>$5.90</SummaryItemPrice>
+            <SummaryItemPrice>100</SummaryItemPrice>
 
             </SummaryItem>
             <SummaryItem>
             <SummaryItemText>Shipping Discount</SummaryItemText>
-            <SummaryItemPrice>$-5.90</SummaryItemPrice>
+            <SummaryItemPrice>-100</SummaryItemPrice>
 
             </SummaryItem>
             <SummaryItem type ="total">
             <SummaryItemText >Total</SummaryItemText>
-            <SummaryItemPrice>$80</SummaryItemPrice>
+            <SummaryItemPrice>{cart.total}</SummaryItemPrice>
 
             </SummaryItem>
             <Button>CHECKOUT NOW</Button>
